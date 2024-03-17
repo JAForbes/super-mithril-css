@@ -48,7 +48,7 @@ export const hyperscriptPlugin = (vnode: Vnode<any>): Vnode<any> => {
 						// in case it can write synchronously
 						const off = v.value.observe((x) => {
 							style[v.varName()] = x == null ? 'unset' : x
-							queueMicrotask(off)
+							queueMicrotask(() => off())
 						})
 					} else {
 						let x = v.value
@@ -90,13 +90,15 @@ export default function Setup(m: Static, options?: Options) {
 	}
 
 	const h: Static = 
-		Object.assign((...args: Parameters<Static>) => {
+		options?.server
+		? Object.assign((...args: Parameters<Static>) => {
 			const vnode = m(...args)
 
 			hyperscriptPlugin(vnode)
 
 			return vnode
 		}, m)
+		: m
 
 	const Component: FactoryComponent<{
 		strings: TemplateStringsArray
@@ -129,18 +131,20 @@ export default function Setup(m: Static, options?: Options) {
 							return
 						}
 
+						(vnode.dom as any).parentNode.classList.add(parsed.hash)
+
 						if (!sheets.has(parsed.hash)) {
 							for (let el of styleEl) {
 								el.textContent += '\n' + parsed.sheets.join('\n')
 							}
 						}
 
-						for (let value of parsed.vars) {
-							if (isStream(value)) {
+						for (let v of parsed.vars) {
+							if (isStream(v.value)) {
 								onremoves.push(
-									value.observe((latest) => {
-										;(vnode.dom as HTMLElement).style.setProperty(
-											value.valueOf(),
+									v.value.observe((latest) => {
+										;(vnode.dom.parentNode as HTMLElement).style.setProperty(
+											v.varName(),
 											latest,
 										)
 									}),
