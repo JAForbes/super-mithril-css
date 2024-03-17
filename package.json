@@ -1,0 +1,46 @@
+{
+	"name": "super-mithril-css",
+	"version": "0.0.0-next.0",
+	"description": "",
+	"type": "module",
+	"main": "./dist/super-mithril-css.esm.js",
+	"types": "./dist/index.ts",
+	"module": "./dist/super-mithril-css.esm.js",
+	"unpkg": "./dist/super-mithril-css.esm.js",
+	"scripts": {
+		"test": "node --import tsx --test test/*.ts",
+		"dev": "node --watch --import tsx --test test/*.ts",
+		"build:bundle": "esbuild lib/index.ts --bundle --format=esm --sourcemap  --allow-overwrite --outfile=./dist/super-mithril-css.esm.js",
+		"build:types": "npx tsc -p tsconfig.test.json && npx tsc",
+		"build:test": "npm run test",
+		"build:clear": "rm -fr ./dist",
+		"build": "npm run build:clear && npm run build:bundle && npm run build:types && npm run build:test",
+		"prepublishOnly": "npm run build && npm version prerelease --preid=next"
+	},
+	"publishConfig": {
+		"tag": "next"
+	},
+	"repository": "git@github.com:JAForbes/super-mithril-css.git",
+	"files": [
+		"dist",
+		"lib",
+		"lib/**"
+	],
+	"keywords": [],
+	"author": "JAForbes",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/node": "^20.11.17",
+		"@typescript-eslint/eslint-plugin": "^6.21.0",
+		"@typescript-eslint/parser": "^6.21.0",
+		"esbuild": "^0.20.0",
+		"eslint": "^8.56.0",
+		"mithril-node-render": "^3.0.2",
+		"prettier": "3.2.5",
+		"tsx": "^4.7.0",
+		"typescript": "^5.0.4"
+	},
+	"dependencies": {
+		"@types/mithril": "^2.2.6"
+	}
+}
