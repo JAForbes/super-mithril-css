@@ -67,7 +67,7 @@ export const hyperscriptPlugin = (vnode: Vnode<any>): Vnode<any> => {
 
 export { pretty }
 
-export default function Setup(m: Static, options: Options) {
+export default function Setup(m: Static, options?: Options) {
 	let styleEl: [HTMLStyleElement] | [] = []
 
 	const base = pretty(`
@@ -89,15 +89,14 @@ export default function Setup(m: Static, options: Options) {
 		sheets.set('', base)
 	}
 
-	const h: Static = options?.server
-		? Object.assign((...args: Parameters<Static>) => {
-				const vnode = m(...args)
+	const h: Static = 
+		Object.assign((...args: Parameters<Static>) => {
+			const vnode = m(...args)
 
-				hyperscriptPlugin(vnode)
+			hyperscriptPlugin(vnode)
 
-				return vnode
-			}, m)
-		: m
+			return vnode
+		}, m)
 
 	const Component: FactoryComponent<{
 		strings: TemplateStringsArray
@@ -116,7 +115,7 @@ export default function Setup(m: Static, options: Options) {
 						}
 					},
 					oninit(vnode) {
-						if (!options.server) {
+						if (!options?.server) {
 							return
 						}
 
@@ -126,7 +125,7 @@ export default function Setup(m: Static, options: Options) {
 						// rest happens in hyperscript plugin
 					},
 					oncreate(vnode) {
-						if (options.server) {
+						if (options?.server) {
 							return
 						}
 
