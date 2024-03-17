@@ -30,11 +30,13 @@
 	"author": "JAForbes",
 	"license": "MIT",
 	"devDependencies": {
+		"@types/jsdom": "^21.1.6",
 		"@types/node": "^20.11.17",
 		"@typescript-eslint/eslint-plugin": "^6.21.0",
 		"@typescript-eslint/parser": "^6.21.0",
 		"esbuild": "^0.20.0",
 		"eslint": "^8.56.0",
+		"jsdom": "^24.0.0",
 		"mithril-node-render": "^3.0.2",
 		"prettier": "3.2.5",
 		"tsx": "^4.7.0",
