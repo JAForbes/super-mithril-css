@@ -23,6 +23,8 @@ type Stream<T> = {
 	observe(update: (x: T) => void): () => void
 }
 
+export { CssLiteral } from './parser'
+
 export function isStream(x: any): x is Stream<any> {
 	return x != null && typeof x.observe === 'function'
 }
