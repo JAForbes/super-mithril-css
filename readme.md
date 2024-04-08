@@ -57,7 +57,7 @@ This is an exhaustive list of what this library does:
 - You can directly inject literal css text via `${css('your text')}`
 - We also pretty print the styles while we parse them and compute the hash, all in one loop.
 - It works in the browser and the server
-- We overload the hyperscript function to allow us to inject the hash selector onto the parent
+- We overload the hyperscript function to allow us to inject the hash selector onto the parent and to re-order elements so attrs always comes first
 - We support nesting css expressions which helps with writing handy utils
 
 It's a lot but its also all pretty focused on giving mithril a close to native css experience with first class reactivity.
@@ -135,9 +135,9 @@ m('h1'
 
 ## Server usage
 
-If you are using [mithril-node-render](https://github.com/MithrilJS/mithril-node-render) you can access the complete sheet to inject into your html via `[...css.sheets.values()]` see the tests for an example.
+If you are using [mithril-node-render](https://github.com/MithrilJS/mithril-node-render) you can access the complete sheet to inject into your html via `[...css.sheets.values()]` (see the tests for an example).
 
-Note in order to attach the the selector the parent element, **for server usage only** we need to override your hyperscript function like so:
+Note: in order to attach the the selector the parent element on the server we need to override your hyperscript function like so:
 
 ```typescript
 import M from 'mithril'
@@ -146,9 +146,7 @@ import CSS from 'super-mithril-css'
 const { m, css } = CSS(m, { server: true })
 ```
 
-In the browser this exact same code is a passthrough to the original mithril hyperscript function, so you can run this code isomorphically.
-
-Once `@scope` is stable on all modern browsers we can remove this constraint.
+In the browser we also override the hyperscript function to ensure attrs written after css nodes are moved to the start of the child list.
 
 ## Browser support
 

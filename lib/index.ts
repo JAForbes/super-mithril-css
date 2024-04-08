@@ -29,7 +29,7 @@ export function isStream(x: any): x is Stream<any> {
 	return x != null && typeof x.observe === 'function'
 }
 
-export const hyperscriptPlugin = (vnode: Vnode<any>): Vnode<any> => {
+export const serverHyperscriptPlugin = (vnode: Vnode<any>): Vnode<any> => {
 	for (let c of vnode.children as any) {
 		if (c.tag === '[') {
 			if (Parser.nested.has(c.children[0])) {
@@ -92,15 +92,30 @@ export default function Setup(m: Static, options?: Options) {
 	}
 
 	const h: Static = 
-		options?.server
-		? Object.assign((...args: Parameters<Static>) => {
+		
+		Object.assign((...args: Parameters<Static>) => {
+			// has to happen before the native mithril hyperscript
+			// because it does the key check there, and it will fail
+			// if attrs isn't the first arg
+			let i = 1;
+			for( let a of args.slice(1) as any[] ) {
+				
+				if (Parser.nested.has(a)) {
+					args.splice(i, 1)
+					args.push(a)
+				}
+				i++
+			}
+			
 			const vnode = m(...args)
 
-			hyperscriptPlugin(vnode)
+			if (options?.server) {
+				serverHyperscriptPlugin(vnode)
+			}
+
 
 			return vnode
 		}, m)
-		: m
 
 	const Component: FactoryComponent<{
 		strings: TemplateStringsArray
@@ -177,5 +192,5 @@ export default function Setup(m: Static, options?: Options) {
 		return out
 	}
 
-	return { css, h, m: h, hyperscriptPlugin }
+	return { css, h, m: h, hyperscriptPlugin: serverHyperscriptPlugin }
 }
