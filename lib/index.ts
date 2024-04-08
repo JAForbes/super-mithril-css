@@ -29,7 +29,35 @@ export function isStream(x: any): x is Stream<any> {
 	return x != null && typeof x.observe === 'function'
 }
 
-export const serverHyperscriptPlugin = (vnode: Vnode<any>): Vnode<any> => {
+export const hyperscriptPlugin = {
+	before(args: any[], options?: Options): any[] {
+		return reorderArgs(args)
+	},
+	after( vnode: Vnode, options?: Options): Vnode {
+		if (options?.server) {
+			return serverHyperscriptPlugin(vnode,)
+		}
+		return vnode
+	}
+}
+
+const reorderArgs = (args: any[]) => {
+	// has to happen before the native mithril hyperscript
+	// because it does the key check there, and it will fail
+	// if attrs isn't the first arg
+	let i = 1;
+	for( let a of args.slice(1) as any[] ) {
+		
+		if (Parser.nested.has(a)) {
+			args.splice(i, 1)
+			args.push(a)
+		}
+		i++
+	}
+	return args
+}
+
+const serverHyperscriptPlugin = (vnode: Vnode<any>): Vnode<any> => {
 	for (let c of vnode.children as any) {
 		if (c.tag === '[') {
 			if (Parser.nested.has(c.children[0])) {
@@ -97,22 +125,11 @@ export default function Setup(m: Static, options?: Options) {
 			// has to happen before the native mithril hyperscript
 			// because it does the key check there, and it will fail
 			// if attrs isn't the first arg
-			let i = 1;
-			for( let a of args.slice(1) as any[] ) {
-				
-				if (Parser.nested.has(a)) {
-					args.splice(i, 1)
-					args.push(a)
-				}
-				i++
-			}
+			hyperscriptPlugin.before(args, options)
 			
 			const vnode = m(...args)
 
-			if (options?.server) {
-				serverHyperscriptPlugin(vnode)
-			}
-
+			hyperscriptPlugin.after(vnode, options)
 
 			return vnode
 		}, m)
@@ -192,5 +209,5 @@ export default function Setup(m: Static, options?: Options) {
 		return out
 	}
 
-	return { css, h, m: h, hyperscriptPlugin: serverHyperscriptPlugin }
+	return { css, h, m: h, hyperscriptPlugin }
 }
