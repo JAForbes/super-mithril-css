@@ -9,7 +9,15 @@
     "outDir": "./dist",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "target": "ES2022"
+    "target": "ES2022",
+    "plugins": [
+      {
+        "name": "typescript-styled-plugin",
+        "lint": {
+          "validProperties": ["#"]
+        }
+      }
+    ]
   },
   "include": ["test/**.ts"],
 }

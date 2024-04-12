@@ -8,7 +8,15 @@
     "emitDeclarationOnly": true,
     "outDir": "./dist",
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "plugins": [
+      {
+        "name": "typescript-styled-plugin",
+        "lint": {
+          "validProperties": ["#"]
+        }
+      }
+    ]
   },
   "include": ["lib/**.ts"],
 }

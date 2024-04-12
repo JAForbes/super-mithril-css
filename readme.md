@@ -16,17 +16,17 @@ const opacity = Stream(1)
 const desktop = css('(min-width: 1000px)')
 
 m('h1', css`
-    color: ${color};
-    opacity: ${opacity};
-    
-    &.active {
-        // very hot!
-        color: hotpink;
-    }
+	color: ${color};
+	opacity: ${opacity};
+	
+	&.active {
+		// very hot!
+		color: hotpink;
+	}
 
-    ${desktop} {
-        color: green;
-    }
+	${desktop} {
+		color: green;
+	}
 `)
 ```
 
@@ -67,26 +67,26 @@ It's a lot but its also all pretty focused on giving mithril a close to native c
 
 ```typescript
 const animate = (from, to, config=css('')) => {
-    return css`
-        @keyframes # {
-            from: {${from}}
-            to: {${to}}
-        }
+	return css`
+		@keyframes # {
+			from: {${from}}
+			to: {${to}}
+		}
 
-        ${from}
+		${from}
 
-        & {
-            animation: # ${config};
-        }
-    `
+		& {
+			animation: # ${config};
+		}
+	`
 }
 
 h('.example'
-    animate(
-        css`opacity: 0;`
-        , css`opacity: 1;`
-        , 'ease-in-out 1s forwards'
-    )
+	animate(
+		css`opacity: 0;`
+		, css`opacity: 1;`
+		, 'ease-in-out 1s forwards'
+	)
 )
 ```
 
@@ -111,26 +111,26 @@ By default all interpolated values in the CSS are treated as css variables.  If 
 ```typescript
 
 const desktop = (cssNode) =>
-    css`
-        ${css(`@media (min-width)`)} {
-            ${cssNode}
-        }
-    `
+	css`
+		${css(`@media (min-width)`)} {
+			${cssNode}
+		}
+	`
 
 m('h1'
-    , desktop(
-        css`
-            & {
-                color: red;
-            }
-        `
-    )
-    , css`
-        & {
-            color: blue;
-        }
-    `
-    , 'Cool'
+	, desktop(
+		css`
+			& {
+				color: red;
+			}
+		`
+	)
+	, css`
+		& {
+			color: blue;
+		}
+	`
+	, 'Cool'
 )
 ```
 
@@ -155,26 +155,48 @@ Within a css expression if you use `:root` the css will be hoisted to the top le
 
 ```typescript
 css`
-    :root {
-        /* Resets */
-        * {
-            margin: 0;
-            padding: 0;
-            hyphens: auto;
-            border: 0 solid var(--border);
-            outline-width: 1px;
-            outline-style: solid;
-            outline-color: transparent;
+	:root {
+		/* Resets */
+		* {
+			margin: 0;
+			padding: 0;
+			hyphens: auto;
+			border: 0 solid var(--border);
+			outline-width: 1px;
+			outline-style: solid;
+			outline-color: transparent;
 
-            &, &::before, &::after {
-                box-sizing: border-box;
-            }
-        }
-    }
+			&, &::before, &::after {
+				box-sizing: border-box;
+			}
+		}
+	}
 `
 ```
 
 All other features will still work in a `:root` block including observables interpolation and css literals.
+
+## Editor support
+
+While not strictly designed for this library, the [vscode-styled-components](https://marketplace.visualstudio.com/items?itemName=styled-components.vscode-styled-components) works well for css property checking and completions.
+
+In other editors its pretty likely you'll get some kind of support as `css` tagged template literals are a good hint to an editor or language service that you are in a css language context.  As this library sticks pretty close to native css we can piggy back on other communities hard work.
+
+One issue you may run into is using `#` as a property name, as typescript will rightly complain that the property name is not valid.  You can configure typescript to treat `#` as a valid property:
+
+```json
+// in your tsconfig.json
+{
+	"plugins": [
+		{
+			"name": "typescript-styled-plugin",
+			"lint": {
+				"validProperties": ["#"]
+			}
+		}
+	]
+}
+```
 
 ## Browser support
 
