@@ -133,7 +133,8 @@ export function parser(_strings: TemplateStringsArray, ..._values: any[]): Parse
 				}
 			}
 
-			if (x === '#' && !string[i + 1]?.match(/[A-z]/)) {
+			// have to account for ids and hex colours
+			if (x === '#' && string[i + 1]?.match(/[A-z][0-9]|\s/)) {
 				if (openGlobal) {
 					globalOuts.push(outs, placeHolderHash)
 				} else {
