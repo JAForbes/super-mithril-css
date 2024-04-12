@@ -10,6 +10,12 @@ function css(strings: TemplateStringsArray, ...values: any[]){
 	return o
 }
 
+const assertStringEq = (a:string,b: string) => {
+	if (a !== b ) {
+		throw new Error('strings not equal: \n' + a + '\n' + b)
+	}
+}
+
 describe('parser', () => {
 
 	it('kitchen sink', () => {
@@ -46,20 +52,20 @@ describe('parser', () => {
 			}
 		`
 
-		assert.equal(
+		assertStringEq(
 			pretty(
 				parsed.sheets.join('\n')
 			),
 			pretty(`
-				.css-hqdj3x {
+				.css-1javx68 {
 	  
 					& {
-						color: var(--css-hqdj3x-1);
+						color: var(--css-1javx68-1);
 						@media(min-width: 1000px){
-							color: var(--css-hqdj3x-2);
+							color: var(--css-1javx68-2);
 						}
 						#id {
-							animation: css-hqdj3x ease-in-out 1s forwards;
+							animation: css-1javx68 ease-in-out 1s forwards;
 						}
 						& {
 							& {
@@ -68,7 +74,7 @@ describe('parser', () => {
 						}
 					}
 				}
-				@keyframes css-hqdj3x {
+				@keyframes css-1javx68 {
 					from {
 						/* semicolons */
 						opacity: 0%;
@@ -81,7 +87,99 @@ describe('parser', () => {
 		)
 	})
 
+
+	it(':root', () => {
+		{
+			const parsed = parser`
+				:root {
+					--color: blue;
+				}
+			`
 	
+			assertStringEq(
+				pretty(
+					parsed.sheets.join('\n')
+				),
+				pretty(`
+					:root {
+						--color: blue;
+					}
+				`)
+			)
+		}
 
+		{
+			const parsed = parser`
+				--color: green;
 
+				:root {
+					--color: blue;
+				}
+			`
+	
+			assertStringEq(
+				pretty(
+					parsed.sheets.join('\n')
+				),
+				pretty(`
+					.css-sjxj49 {
+						--color: green;
+					}
+					:root {
+						--color: blue;
+					}
+				`)
+			)
+		}
+
+		{
+			const parsed = parser`
+				--color: green;
+
+				:root {
+					:root {
+						--color: blue;
+
+						@keyframes # {
+							from {
+								/* semicolons */
+								opacity: 0%;
+							}
+							to {
+								opacity: 100%;
+							}
+						}
+					}
+				}
+
+				--size: 100px;
+			`
+	
+			assertStringEq(
+				pretty(
+					parsed.sheets.join('\n')
+				),
+				pretty(`
+					.css-1ww73i5 {
+						--color: green;
+						--size: 100px;
+					}
+					:root {
+						:root {
+							--color: blue;
+							@keyframes css-1ww73i5 {
+								from {
+								/* semicolons */
+								opacity: 0%;
+								}
+								to {
+								opacity: 100%;
+								}
+							}
+						}
+					}
+				`)
+			)
+		}
+	})
 })

@@ -29,7 +29,7 @@ test('server', async () => {
 		),
 	)
 
-	const className = `css-9qp30q`
+	const className = `css-3wjkw3`
 	const jsdom = new JSDOM(`
 		<html>
 			<body>
@@ -44,13 +44,13 @@ test('server', async () => {
 			css-node {
 				display: none;
 			}
-			.css-9qp30q {
-				color: var(--css-9qp30q-1);
+			.css-3wjkw3 {
+				color: var(--css-3wjkw3-1);
 				@media(min-width: 1000px) {
-					color: var(--css-9qp30q-2);
+					color: var(--css-3wjkw3-2);
 				}
 				#id {
-					animation: css-9qp30q ease-in-out 1s forwards;
+					animation: css-3wjkw3 ease-in-out 1s forwards;
 				}
 			}
 		`),

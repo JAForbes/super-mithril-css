@@ -67,8 +67,8 @@ export function parser(_strings: TemplateStringsArray, ..._values: any[]): Parse
 	}
 
 
-	let strings = ['.# {', ..._strings, '}']
-	let values = [new CssLiteral(''), ..._values]
+	let strings = _strings as any as string[]
+	let values = _values
 	let levels = 0
 	let insignificant = true
 	let hashCode = 0
@@ -79,10 +79,10 @@ export function parser(_strings: TemplateStringsArray, ..._values: any[]): Parse
 	let hash = ''
 	let vars: VarPlaceholder[] = []
 	let varI = 0
-	let keyFrameOutIndex = 0
-	let keyframeOuts: any[] = []
-	let keyFrameLevel = 0
-	let openKeyframes = false
+	let globalOutIndex = 0
+	let globalOuts: any[] = []
+	let globalLevel = 0
+	let openGlobal = false
 	let openProperty = false;
 	let openComment = false;
 
@@ -134,7 +134,11 @@ export function parser(_strings: TemplateStringsArray, ..._values: any[]): Parse
 			}
 
 			if (x === '#' && !string[i + 1]?.match(/[A-z]/)) {
-				out.push(outs, placeHolderHash)
+				if (openGlobal) {
+					globalOuts.push(outs, placeHolderHash)
+				} else {
+					out.push(outs, placeHolderHash)
+				}
 				outs = ''
 				continue
 			}
@@ -142,15 +146,24 @@ export function parser(_strings: TemplateStringsArray, ..._values: any[]): Parse
 			if (
 				x === '@' &&
 				string.slice(i, i + '@keyframes'.length) === '@keyframes'
+				&& !openGlobal
 			) {
 				out.push(outs)
 				outs = ''
-				keyFrameOutIndex = out.length
+				globalOutIndex = out.length
 
 				// assumes you don't nest key frames
 				// you wouldn't do that would you!?
-				openKeyframes = true
-				keyFrameLevel = levels
+				openGlobal = true
+				globalLevel = levels
+			}
+
+			if ( x === ':' && string.slice(i, i + ':root'.length ) === ':root' && !openGlobal ) {
+				out.push(outs)
+				outs = ''
+				globalOutIndex = out.length
+				openGlobal = true
+				globalLevel = levels
 			}
 
 			if (x === '{') {
@@ -164,26 +177,26 @@ export function parser(_strings: TemplateStringsArray, ..._values: any[]): Parse
 				}
 				levels = levels - 1
 				outs +=
-					'  '.repeat(openKeyframes ? levels - keyFrameLevel : levels) + '}\n'
+					'  '.repeat(openGlobal ? levels - globalLevel : levels) + '}\n'
 				insignificant = true
 
-				if (openKeyframes && keyFrameLevel === levels) {
-					openKeyframes = false
+				if (openGlobal && globalLevel === levels) {
+					openGlobal = false
 					out.push(outs)
 					outs = ''
 
 					// put the key frame source in the correct list
-					keyframeOuts.push(...out.slice(keyFrameOutIndex))
+					globalOuts.push(...out.slice(globalOutIndex))
 
 					// remove the keyframe source
-					out.splice(keyFrameOutIndex, out.length - keyFrameOutIndex)
+					out.splice(globalOutIndex, out.length - globalOutIndex)
 				}
 				continue
 			}
 
 			if (insignificant) {
 				insignificant = false
-				outs += '  '.repeat(openKeyframes ? levels - keyFrameLevel : levels)
+				outs += '  '.repeat(openGlobal ? levels - globalLevel : levels)
 				outs += x
 				continue
 			}
@@ -195,10 +208,10 @@ export function parser(_strings: TemplateStringsArray, ..._values: any[]): Parse
 			if (value instanceof CssLiteral ) {
 				if (insignificant) {
 					insignificant = false
-					outs += '  '.repeat(openKeyframes ? levels - keyFrameLevel : levels)
+					outs += '  '.repeat(openGlobal ? levels - globalLevel : levels)
 				}
 				outs += value.value
-				out.push(outs)
+				openGlobal ? globalOuts.push(outs) : out.push(outs)
 				outs = ''
 			} else if (nested.has(value)) {
 				const { strings, values } = nested.get(value)!()
@@ -207,26 +220,29 @@ export function parser(_strings: TemplateStringsArray, ..._values: any[]): Parse
 			} else {
 				let placeholder = new VarPlaceholder(++varI, value)
 				vars.push(placeholder)
-				out.push(outs, placeholder)
+				openGlobal ? globalOuts.push(outs, placeholder) : out.push(outs, placeholder)
 				outs = ''
 			}
 		} else {
-			out.push(outs)
+			openGlobal ? globalOuts.push(outs) : out.push(outs)
 			outs = ''
 		}
 	}
 
 	hash = `css-${new Uint32Array([hashCode])[0].toString(36)}`
 
+	const mainBodyEmpty = out.length === 2 && out.filter( x => x !== '').length == 0
 	const parsed = {
 		hash,
 		strings,
-		values,
+		values: mainBodyEmpty ? values : [new CssLiteral(''), ...values],
 		vars,
-		sheets: [
-			out.map((x) => x + '').join(''),
-			keyframeOuts.map((x) => x + '').join(''),
-		],
+		sheets:  [
+			mainBodyEmpty
+			? ''
+			: [`.${hash} {`, ...out, '}'].map((x) => x + '').join('')
+			, globalOuts.map((x) => x + '').join('')
+		]
 	}
 
 	return parsed

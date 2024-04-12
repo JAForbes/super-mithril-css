@@ -27,7 +27,7 @@ test('browser', async () => {
 	const { css, m } = CSS(M, { server: false })
 	const desktop = css('@media(min-width: 1000px)')
 
-	const className = `css-1mq4ax6`
+	const className = `css-x3m6yr`
 
 	m.mount(document.body, () => {
 		return {

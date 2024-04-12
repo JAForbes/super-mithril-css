@@ -49,8 +49,9 @@ This is an exhaustive list of what this library does:
 - Takes any interpolated values you set and makes them css variables
 - If your intepolated value adheres to the (sin.js inspired) observable spec, we will subscribe to them and patch the dom without redraws
 - If its not an observable, the value is injected literally with no processing and updates whenever there is a redraw
-- We automatically wrap your original CSS definition in hash selector to isolate your styles to the current scope
-- We identify any keyframe definitions and move them to the top level (because they don't work with the nested css spec)
+- We automatically wrap your original CSS definition in a block with a hash selector to isolate your styles to the current scope
+- We identify any `@keyframes` definitions and move them to the top level (because they don't work with the nested css spec)
+- We identify any `:root` blocks and move them to the top level
 - We replace `#` with the hash of your sheet (but we leave id references as is)
 - If you forget a semicolon, we'll inject it
 - If you use `// comments` we'll fix it for you
@@ -147,6 +148,33 @@ const { m, css } = CSS(m, { server: true })
 ```
 
 In the browser we also override the hyperscript function to ensure attrs written after css nodes are moved to the start of the child list.
+
+## Global css
+
+Within a css expression if you use `:root` the css will be hoisted to the top level of the produced document.  So any selectors that you'd like to be global should use a `:root` block e.g.
+
+```typescript
+css`
+    :root {
+        /* Resets */
+        * {
+            margin: 0;
+            padding: 0;
+            hyphens: auto;
+            border: 0 solid var(--border);
+            outline-width: 1px;
+            outline-style: solid;
+            outline-color: transparent;
+
+            &, &::before, &::after {
+                box-sizing: border-box;
+            }
+        }
+    }
+`
+```
+
+All other features will still work in a `:root` block including observables interpolation and css literals.
 
 ## Browser support
 
