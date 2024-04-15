@@ -30,10 +30,10 @@ export function isStream(x: any): x is Stream<any> {
 }
 
 export const hyperscriptPlugin = {
-	before(args: any[], options?: Options): any[] {
+	before(args: any[], options?: Record<string, any>): any[] {
 		return reorderArgs(args)
 	},
-	after( vnode: Vnode, options?: Options): Vnode {
+	after( vnode: Vnode, options?: Record<string, any>): Vnode {
 		if (options?.server) {
 			return serverHyperscriptPlugin(vnode,)
 		}
