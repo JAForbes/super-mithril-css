@@ -47,7 +47,7 @@ const reorderArgs = (args: any[]) => {
 	// if attrs isn't the first arg
 	let i = 1;
 	for( let a of args.slice(1) as any[] ) {
-		
+
 		if (Parser.nested.has(a)) {
 			args.splice(i, 1)
 			args.push(a)
@@ -100,12 +100,6 @@ export { pretty }
 export default function Setup(m: Static, options?: Options) {
 	let styleEl: [HTMLStyleElement] | [] = []
 
-	const base = pretty(`
-		css-node {
-			display: none;
-		}
-	`)
-
 	if (!options?.server) {
 		styleEl = [document.createElement('style')]
 
@@ -113,20 +107,18 @@ export default function Setup(m: Static, options?: Options) {
 			el.type = 'text/css'
 			document.head.appendChild(el)
 
-			el.textContent += '\n' + base
+			el.textContent += '\n'
 		}
-	} else {
-		sheets.set('', base)
 	}
 
-	const h: Static = 
-		
+	const h: Static =
+
 		Object.assign((...args: Parameters<Static>) => {
 			// has to happen before the native mithril hyperscript
 			// because it does the key check there, and it will fail
 			// if attrs isn't the first arg
 			hyperscriptPlugin.before(args, options)
-			
+
 			const vnode = m(...args)
 
 			hyperscriptPlugin.after(vnode, options)
@@ -161,11 +153,16 @@ export default function Setup(m: Static, options?: Options) {
 						// rest happens in hyperscript plugin
 					},
 					oncreate(vnode) {
+						const {parentNode} = vnode.dom;
+
+						// Leave DOM structure intact
+						(parentNode as HTMLElement).removeChild(vnode.dom)
+
 						if (options?.server) {
 							return
 						}
 
-						(vnode.dom as any).parentNode.classList.add(parsed.hash)
+						(parentNode as HTMLElement).classList.add(parsed.hash)
 
 						if (!sheets.has(parsed.hash)) {
 							for (let el of styleEl) {
@@ -177,7 +174,7 @@ export default function Setup(m: Static, options?: Options) {
 							if (isStream(v.value)) {
 								onremoves.push(
 									v.value.observe((latest) => {
-										;(vnode.dom.parentNode as HTMLElement).style.setProperty(
+										(parentNode as HTMLElement).style.setProperty(
 											v.varName(),
 											latest,
 										)
