@@ -1,7 +1,7 @@
 import * as Parser from './parser'
 import { pretty } from './pretty'
 
-import type { Static, FactoryComponent, Vnode, VnodeDOM } from 'mithril'
+import type { Static, Component, FactoryComponent, Vnode, VnodeDOM } from 'mithril'
 
 function isTemplateString(strings: any): strings is TemplateStringsArray {
 	// deliberately a lie to make it easier to make utils in userland with
@@ -126,6 +126,8 @@ export default function Setup(m: Static, options?: Options) {
 			return vnode
 		}, m)
 
+	const Empty: Component = {view: () => ''}
+
 	const Component: FactoryComponent<{
 		strings: TemplateStringsArray
 		values: any[]
@@ -134,7 +136,7 @@ export default function Setup(m: Static, options?: Options) {
 		return {
 			view: ({ attrs: { strings, values } }) => {
 				const parsed = Parser.cachedParser(strings, ...values)
-				return m('css-node', {
+				return m(Empty, {
 					key: parsed.hash,
 					onremove() {
 						while (onremoves.length) {
@@ -153,16 +155,13 @@ export default function Setup(m: Static, options?: Options) {
 						// rest happens in hyperscript plugin
 					},
 					oncreate(vnode) {
-						const {parentNode} = vnode.dom;
-
-						// Leave DOM structure intact
-						(parentNode as HTMLElement).removeChild(vnode.dom)
+						const parent = vnode.dom.parentNode as HTMLElement;
 
 						if (options?.server) {
 							return
 						}
 
-						(parentNode as HTMLElement).classList.add(parsed.hash)
+						parent.classList.add(parsed.hash)
 
 						if (!sheets.has(parsed.hash)) {
 							for (let el of styleEl) {
@@ -174,7 +173,7 @@ export default function Setup(m: Static, options?: Options) {
 							if (isStream(v.value)) {
 								onremoves.push(
 									v.value.observe((latest) => {
-										(parentNode as HTMLElement).style.setProperty(
+										parent.style.setProperty(
 											v.varName(),
 											latest,
 										)
