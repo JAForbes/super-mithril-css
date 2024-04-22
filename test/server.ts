@@ -48,9 +48,6 @@ test('server', async () => {
 	assertStringEq(
 		pretty([...sheets.values()].join('')),
 		pretty(`
-			css-node {
-				display: none;
-			}
 			.css-3wjkw3 {
 				color: var(--css-3wjkw3-1);
 				@media(min-width: 1000px) {

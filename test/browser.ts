@@ -57,9 +57,6 @@ test('browser', async () => {
 	assert.equal(
 		pretty(document.head.children[0].innerHTML),
 		pretty(`
-			css-node {
-				display: none;
-			}
 		  .${className} {
 			color: var(--${className}-1);
 			@media(min-width: 1000px) {
