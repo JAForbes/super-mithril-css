@@ -8,7 +8,7 @@ const { css, m } = CSS(hyperscript, { server: true})
 
 describe('re-order', () => {
     test('re-order', () => {
-        const rendered = (m as any)('h1', css`color: green`, { key: 'cool' }, 'hello')
+        const rendered = (m as any)('h1', css`color: green`, css`color: green`, { key: 'cool' }, 'hello')
 
         assert.equal(rendered.key, 'cool')
         assert.equal(rendered.children[0].tag,'#')

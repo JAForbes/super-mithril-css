@@ -45,14 +45,19 @@ const reorderArgs = (args: any[]) => {
 	// has to happen before the native mithril hyperscript
 	// because it does the key check there, and it will fail
 	// if attrs isn't the first arg
-	let i = 1;
-	for( let a of args.slice(1) as any[] ) {
 
+	let newArgs = [args.shift()]
+	let cssArgs = []
+	while (args.length) {
+		let a = args.shift()
 		if (Parser.nested.has(a)) {
-			args.splice(i, 1)
-			args.push(a)
+			cssArgs.push(a)
+		} else {
+			newArgs.push(a)
 		}
-		i++
+	}
+	for( let x of newArgs.concat(cssArgs) ) {
+		args.push(x)
 	}
 	return args
 }
