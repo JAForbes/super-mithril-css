@@ -137,19 +137,39 @@ export default function Setup(m: Static, options?: Options) {
 		strings: TemplateStringsArray
 		values: any[]
 	}> = () => {
-		const onremoves: (() => void)[] = []
+		const observers: (() => void)[] = []
+		const sources: any[] = []
+
+		// If the source has changed we need to resubscribe and end the old subscription
+		// otherwise just use the existing source
+		const observe = (parent: HTMLElement, varName:string, i:number, source: Stream<any>) => {
+			if ( sources[i] === source ) {
+				return;
+			}
+
+			sources[i] = source
+			observers[i]()
+
+			observers[i] = 
+				source.observe((latest:any) => {
+					parent.style.setProperty(
+						varName,
+						latest,
+					)
+				})
+		}
+		
 		return {
-			view: ({ attrs: { strings, values } }) => {
+			view: ({ attrs: { strings, values } }: Vnode<{ strings: TemplateStringsArray, values: any[] }>) => {
 				const parsed = Parser.cachedParser(strings, ...values)
 				return m(Empty, {
 					key: parsed.hash,
 					onremove() {
-						while (onremoves.length) {
-							let f = onremoves.shift()!
-							f()
+						for(let end of observers) {
+							end()
 						}
 					},
-					oninit(vnode) {
+					oninit() {
 						if (!options?.server) {
 							return
 						}
@@ -159,7 +179,7 @@ export default function Setup(m: Static, options?: Options) {
 						}
 						// rest happens in hyperscript plugin
 					},
-					oncreate(vnode) {
+					oncreate(vnode: VnodeDOM) {
 						const parent = vnode.dom.parentNode as HTMLElement;
 
 						if (options?.server) {
@@ -175,18 +195,34 @@ export default function Setup(m: Static, options?: Options) {
 						}
 
 						for (let v of parsed.vars) {
-							if (isStream(v.value)) {
-								onremoves.push(
-									v.value.observe((latest) => {
-										parent.style.setProperty(
-											v.varName(),
-											latest,
-										)
-									}),
-								)
+							let value = v.value
+							let _isStream = false;
+							unwrapFunction: while (true) {
+								if (isStream(value)) {
+									_isStream = true
+									break unwrapFunction
+								}
+								if (typeof value === 'function' ) {
+									value = value()
+								} else {
+									break unwrapFunction;
+								}
+							}
+
+							if (_isStream) {
+								observe(parent, v.varName(), v.i, value)
 							}
 						}
 					},
+					onupdate(vnode: VnodeDOM){
+						const parent = vnode.dom.parentNode as HTMLElement;
+
+						for (let v of parsed.vars) {
+							if (isStream(v.value)) {
+								observe(parent, v.varName(), v.i, v.value)
+							}
+						}
+					}
 				})
 			},
 		}

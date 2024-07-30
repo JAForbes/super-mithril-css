@@ -21,9 +21,35 @@ export const nested = new WeakMap<any, () => ({ strings: TemplateStringsArray, v
 export function cachedParser(strings: TemplateStringsArray, ...values: any[]): Parsed {
 	if (parsedByTemplate.has(strings)) {
 		const parsed = parsedByTemplate.get(strings)!
+		const vars: VarPlaceholder[] = []
+
+		let varI = 0;
+		for(let value of values ) {
+			if (value instanceof CssLiteral ) {
+				continue;
+			} else if (nested.has(value)) {
+				continue;
+			} else {
+				vars.push({
+					i: ++varI,
+					value,
+					varRef(){
+						return `var(--${parsed.hash}-${this.i})`
+					},
+					varName(){
+						return `--${parsed.hash}-${this.i}`
+					},
+					valueOf(){
+						return this.varRef()
+					}
+				})
+			}
+		}
+
 		return {
 			...parsed,
-			values
+			values,
+			vars
 		}
 	}
 	const out = parser(strings, ...values)
