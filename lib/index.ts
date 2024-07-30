@@ -157,7 +157,6 @@ export default function Setup(m: Static, options?: Options) {
 						latest,
 					)
 				})
-				?? (() => {})
 		}
 		
 		return {
@@ -211,7 +210,7 @@ export default function Setup(m: Static, options?: Options) {
 							}
 
 							if (_isStream) {
-								observe(parent, v.varName(), v.i, value)
+								observe(parent, v.varName(), v.i-1, value)
 							}
 						}
 					},
@@ -220,7 +219,7 @@ export default function Setup(m: Static, options?: Options) {
 
 						for (let v of parsed.vars) {
 							if (isStream(v.value)) {
-								observe(parent, v.varName(), v.i, v.value)
+								observe(parent, v.varName(), v.i-1, v.value)
 							}
 						}
 					}
