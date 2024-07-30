@@ -148,7 +148,7 @@ export default function Setup(m: Static, options?: Options) {
 			}
 
 			sources[i] = source
-			observers[i]()
+			observers[i]?.()
 
 			observers[i] = 
 				source.observe((latest:any) => {
