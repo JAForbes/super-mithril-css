@@ -157,6 +157,7 @@ export default function Setup(m: Static, options?: Options) {
 						latest,
 					)
 				})
+				?? (() => {})
 		}
 		
 		return {
