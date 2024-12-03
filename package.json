@@ -19,6 +19,10 @@
 		"build": "npm run build:clear && npm run build:bundle && npm run build:types && npm run build:test",
 		"prepublishOnly": "npm run build && npm version prerelease --preid=next"
 	},
+	"exports": {
+		".": "./dist/super-mithril-css.esm.js",
+		"./m": "./dist/mithril.esm.js"
+	},
 	"publishConfig": {
 		"tag": "next"
 	},
