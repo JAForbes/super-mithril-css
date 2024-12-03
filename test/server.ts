@@ -1,9 +1,9 @@
 import test from 'node:test'
 import assert from 'node:assert'
-import hyperscript from 'mithril'
 // @ts-ignore
 import render from 'mithril-node-render'
-import CSS, { sheets, pretty } from '../lib'
+import { sheets, pretty } from '../lib'
+
 import { JSDOM } from 'jsdom'
 
 const assertStringEq = (a:string,b: string) => {
@@ -14,7 +14,7 @@ const assertStringEq = (a:string,b: string) => {
 
 
 test('server', async () => {
-	const { css, m } = CSS(hyperscript, { server: true})
+	const { css, default: m } = await import('../lib/m')
 	const desktop = css('@media(min-width: 1000px)')
 	const rendered = await render(
 		m(

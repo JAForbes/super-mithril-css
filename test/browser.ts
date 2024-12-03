@@ -1,5 +1,5 @@
 import test from 'node:test'
-import CSS, { pretty, sheets } from '../lib'
+import { pretty, sheets } from '../lib'
 import { JSDOM, VirtualConsole } from 'jsdom'
 import assert from 'node:assert'
 
@@ -22,9 +22,7 @@ test('browser', async () => {
 	// just sync render, easier tests
 	;(globalThis as any).requestAnimationFrame = (f:any) => f()
 
-	const { default: M } = await import('mithril')
-
-	const { css, m } = CSS(M, { server: false })
+	const { css, default:m } = await import('../lib/m')
 	const desktop = css('@media(min-width: 1000px)')
 
 	const className = `css-x3m6yr`
