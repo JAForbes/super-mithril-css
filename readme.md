@@ -2,6 +2,8 @@
 
 🎨 A simple css-in-js solution for mithril.js
 
+> 🚨 This library is very new and not production ready.  Please feel free to try it out and provide feedback, but also be prepared for the occasional parser bug or some breaking API changes down the line.
+
 ## Quick Start
 
 ```typescript
@@ -141,8 +143,9 @@ If you are using [mithril-node-render](https://github.com/MithrilJS/mithril-node
 Note: in order to attach the the selector the parent element on the server we need to override your hyperscript function like so:
 
 ```typescript
-import M from 'mithril'
+import { sheets } from '../lib'
 import m, { css } from 'super-mithril-css/m'
+
 ```
 
 In the browser we also override the hyperscript function to ensure attrs written after css nodes are moved to the start of the child list.
