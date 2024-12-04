@@ -23,9 +23,6 @@
 		".": "./dist/super-mithril-css.esm.js",
 		"./m": "./dist/mithril.esm.js"
 	},
-	"publishConfig": {
-		"tag": "next"
-	},
 	"repository": "git@github.com:JAForbes/super-mithril-css.git",
 	"files": [
 		"dist",
