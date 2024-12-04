@@ -1,6 +1,6 @@
 {
 	"name": "super-mithril-css",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"description": "",
 	"type": "module",
 	"main": "./dist/super-mithril-css.esm.js",
