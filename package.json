@@ -1,6 +1,6 @@
 {
 	"name": "super-mithril-css",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"description": "",
 	"type": "module",
 	"main": "./dist/index.js",
@@ -17,7 +17,7 @@
 		"build:test": "npm run test",
 		"build:clear": "rm -fr ./dist",
 		"build": "npm run build:clear && npm run build:bundle && npm run build:types && npm run build:test",
-		"prepublishOnly": "npm run build && npm version patch"
+		"prepublishOnly": "npm run build"
 	},
 	"exports": {
 		".": "./dist/index.js",
