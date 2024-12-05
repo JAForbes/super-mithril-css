@@ -3,14 +3,14 @@
 	"version": "0.0.5",
 	"description": "",
 	"type": "module",
-	"main": "./dist/super-mithril-css.esm.js",
+	"main": "./dist/index.js",
 	"types": "./dist/index.ts",
-	"module": "./dist/super-mithril-css.esm.js",
-	"unpkg": "./dist/super-mithril-css.esm.js",
+	"module": "./dist/index.js",
+	"unpkg": "./dist/index.js",
 	"scripts": {
 		"test": "node --import tsx --test test/*.ts",
 		"dev": "node --watch --import tsx --test test/*.ts",
-		"build:bundle:index": "esbuild lib/index.ts --bundle --format=esm --sourcemap  --allow-overwrite --outfile=./dist/super-mithril-css.esm.js",
+		"build:bundle:index": "esbuild lib/index.ts --bundle --format=esm --sourcemap  --allow-overwrite --outfile=./dist/index.js",
 		"build:bundle:m": "esbuild lib/m.ts --bundle --format=esm --sourcemap  --allow-overwrite --outfile=./dist/m.js",
 		"build:bundle": "npm run build:bundle:index && npm run build:bundle:m",
 		"build:types": "npx tsc -p tsconfig.test.json && npx tsc",
@@ -20,7 +20,7 @@
 		"prepublishOnly": "npm run build && npm version patch"
 	},
 	"exports": {
-		".": "./dist/super-mithril-css.esm.js",
+		".": "./dist/index.js",
 		"./m": "./dist/m.js"
 	},
 	"repository": "git@github.com:JAForbes/super-mithril-css.git",
