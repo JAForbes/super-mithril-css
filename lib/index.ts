@@ -217,6 +217,8 @@ export default function Setup(m: Static, options?: Options) {
 					onupdate(vnode: VnodeDOM){
 						const parent = vnode.dom.parentNode as HTMLElement;
 
+						parent.classList.add(parsed.hash)
+
 						for (let v of parsed.vars) {
 							if (isStream(v.value)) {
 								observe(parent, v.varName(), v.i-1, v.value)
