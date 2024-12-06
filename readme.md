@@ -42,7 +42,7 @@ It has a few more features, but not much more than that.
 
 ## Why
 
-We've had this built in to our internal fork of Mithril at [harth](harth.io) for a long time, but we're trying to extract a lot of that code into tiny libraries to share with the community.
+We've had this built in to our internal fork of Mithril at [harth](https://harth.io) for a long time, but we're trying to extract a lot of that code into tiny libraries to share with the community.
 
 ## Tell me more
 
